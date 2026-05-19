@@ -1,0 +1,1068 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Soul Support · Александра Мозер</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300&family=Jost:wght@300;400;500&display=swap');
+
+  :root {
+    --bg: #0a1410;
+    --bg2: #0f1d18;
+    --bg3: #14231e;
+    --gold: #c9a961;
+    --gold2: #e8d5a3;
+    --gold-soft: rgba(201, 169, 97, 0.12);
+    --border: rgba(201, 169, 97, 0.15);
+    --green-deep: #1a3329;
+    --text: #ede8d8;
+    --text2: #8a8470;
+    --text3: #4a4839;
+    --rose: #b88a8a;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+  html, body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Jost', sans-serif;
+    font-weight: 300;
+    min-height: 100vh;
+    overflow-x: hidden;
+    line-height: 1.6;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 60% 40% at 30% 0%, rgba(26, 51, 41, 0.5), transparent 70%),
+      radial-gradient(ellipse 50% 30% at 70% 100%, rgba(26, 51, 41, 0.4), transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .app { position: relative; z-index: 1; padding-bottom: 50px; }
+
+  .topbar {
+    padding: 18px 20px 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+  .user { display: flex; align-items: center; gap: 10px; }
+  .avatar {
+    width: 38px; height: 38px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--gold), #8a7340);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px; font-weight: 500;
+    color: var(--bg);
+    overflow: hidden;
+    flex-shrink: 0;
+  }
+  .avatar img { width: 100%; height: 100%; object-fit: cover; }
+  .user-text { display: flex; flex-direction: column; line-height: 1.2; }
+  .user-name { font-size: 13px; color: var(--text); font-weight: 400; }
+  .user-label {
+    font-size: 10px; color: var(--text2);
+    letter-spacing: 0.15em; text-transform: uppercase; margin-top: 2px;
+  }
+
+  .lang-toggle {
+    display: flex; background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 100px; padding: 3px; gap: 2px;
+  }
+  .lang-toggle button {
+    padding: 5px 11px; border: none; background: transparent;
+    color: var(--text2); font-family: inherit; font-size: 11px; font-weight: 400;
+    border-radius: 100px; cursor: pointer; letter-spacing: 0.05em;
+    transition: all 0.2s;
+  }
+  .lang-toggle button.active { background: var(--gold); color: var(--bg); font-weight: 500; }
+
+  .brand {
+    text-align: center; padding: 36px 20px 30px; position: relative;
+  }
+  .brand::before, .brand::after {
+    content: '';
+    position: absolute; left: 50%; transform: translateX(-50%);
+    width: 60px; height: 1px;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+    opacity: 0.5;
+  }
+  .brand::before { top: 16px; }
+  .brand::after { bottom: 16px; }
+  .brand-emblem { display: block; margin: 0 auto 18px; opacity: 0.7; }
+  .brand-mark {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 36px; font-weight: 300; font-style: italic;
+    color: var(--gold2); line-height: 1.1; letter-spacing: 0.02em;
+  }
+  .brand-sub {
+    margin-top: 12px; font-size: 10px; color: var(--text2);
+    letter-spacing: 0.4em; text-transform: uppercase;
+  }
+
+  .tabs-wrap { padding: 0 20px; margin-bottom: 24px; }
+  .tabs {
+    display: flex; gap: 4px; background: var(--bg2);
+    border: 1px solid var(--border); border-radius: 14px; padding: 4px;
+    overflow-x: auto; scrollbar-width: none;
+  }
+  .tabs::-webkit-scrollbar { display: none; }
+  .tab {
+    flex: 1; min-width: max-content; padding: 9px 12px;
+    border-radius: 10px; font-family: inherit; font-size: 12px; font-weight: 400;
+    border: none; background: transparent; color: var(--text2);
+    cursor: pointer; transition: all 0.2s;
+    white-space: nowrap; letter-spacing: 0.03em;
+  }
+  .tab.active { background: var(--gold); color: var(--bg); font-weight: 500; }
+
+  .content { padding: 0 20px; display: none; }
+  .content.active { display: block; }
+
+  .section-label {
+    font-size: 10px; color: var(--text2);
+    letter-spacing: 0.3em; text-transform: uppercase;
+    margin-bottom: 12px; text-align: center;
+  }
+  .section-label::before, .section-label::after {
+    content: '— '; color: var(--gold); opacity: 0.5;
+  }
+  .section-label::after { content: ' —'; }
+
+  .cal-card {
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: 18px; padding: 18px; margin-bottom: 20px;
+  }
+  .month-nav {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 16px;
+  }
+  .month-nav h2 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 22px; font-weight: 400; color: var(--gold2);
+    text-transform: capitalize;
+  }
+  .month-btn {
+    width: 32px; height: 32px; border-radius: 50%;
+    border: 1px solid var(--border); background: transparent;
+    color: var(--gold); cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px; transition: all 0.2s;
+    font-family: 'Cormorant Garamond', serif;
+  }
+  .month-btn:hover { background: var(--gold-soft); }
+
+  .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
+  .cal-day-name {
+    text-align: center; font-size: 9px; color: var(--text3);
+    padding: 6px 0 8px; letter-spacing: 0.1em; text-transform: uppercase;
+  }
+  .cal-day {
+    aspect-ratio: 1; display: flex; align-items: center; justify-content: center;
+    border-radius: 10px; font-size: 14px; font-weight: 300;
+    cursor: default; transition: all 0.15s; position: relative;
+    color: var(--text2);
+  }
+  .cal-day.empty { visibility: hidden; }
+  .cal-day.past { color: var(--text3); }
+  .cal-day.today { color: var(--gold); font-weight: 500; }
+  .cal-day.has-slots { color: var(--text); cursor: pointer; background: var(--bg3); }
+  .cal-day.has-slots:hover { background: var(--gold-soft); color: var(--gold); }
+  .cal-day.selected { background: var(--gold); color: var(--bg); font-weight: 500; }
+  .cal-day .dot {
+    position: absolute; bottom: 5px; width: 3px; height: 3px;
+    border-radius: 50%; background: var(--gold); opacity: 0.7;
+  }
+  .cal-day.selected .dot { display: none; }
+
+  .slots-section { margin-bottom: 24px; }
+  .slots-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 8px; margin-bottom: 16px;
+  }
+  .slot-btn {
+    padding: 14px 8px; border-radius: 12px;
+    border: 1px solid var(--border); background: var(--bg2);
+    color: var(--text); font-family: inherit; font-size: 14px;
+    cursor: pointer; transition: all 0.15s;
+  }
+  .slot-btn:hover { border-color: var(--gold); color: var(--gold); }
+  .slot-btn.selected {
+    background: var(--gold); border-color: var(--gold);
+    color: var(--bg); font-weight: 500;
+  }
+
+  .btn {
+    width: 100%; padding: 16px; border-radius: 100px;
+    background: var(--gold); color: var(--bg);
+    font-family: 'Jost', sans-serif; font-size: 12px; font-weight: 500;
+    letter-spacing: 0.2em; text-transform: uppercase;
+    border: none; cursor: pointer; transition: all 0.2s;
+  }
+  .btn:disabled { opacity: 0.3; cursor: not-allowed; }
+  .btn:not(:disabled):hover { background: var(--gold2); }
+
+  .stats-row {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 10px; margin-bottom: 20px;
+  }
+  .stat {
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: 16px; padding: 18px; text-align: center;
+  }
+  .stat-num {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 38px; font-weight: 300; color: var(--gold2); line-height: 1;
+  }
+  .stat-lbl {
+    margin-top: 6px; font-size: 9px; color: var(--text2);
+    letter-spacing: 0.25em; text-transform: uppercase;
+  }
+
+  .mood-card {
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: 18px; padding: 18px; margin-bottom: 24px;
+  }
+  .mood-card h3 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 16px; font-weight: 400; color: var(--gold2);
+    margin-bottom: 18px; font-style: italic;
+  }
+  .mood-bars { display: flex; align-items: flex-end; gap: 6px; height: 90px; }
+  .mood-bar-wrap {
+    flex: 1; display: flex; flex-direction: column;
+    align-items: center; gap: 6px; height: 100%; justify-content: flex-end;
+  }
+  .mood-bar {
+    width: 100%; border-radius: 6px 6px 0 0;
+    background: linear-gradient(180deg, var(--gold), rgba(201, 169, 97, 0.3));
+    transition: height 0.6s cubic-bezier(0.34,1.56,0.64,1); min-height: 4px;
+  }
+  .mood-bar-date { font-size: 9px; color: var(--text2); letter-spacing: 0.05em; }
+  .mood-bar-emoji { font-size: 13px; }
+
+  .booking-item {
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: 14px; padding: 14px 16px; margin-bottom: 8px;
+    display: flex; align-items: center; gap: 12px;
+  }
+  .booking-icon {
+    width: 36px; height: 36px; border-radius: 10px;
+    background: var(--gold-soft); color: var(--gold);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px; flex-shrink: 0;
+  }
+  .booking-info { flex: 1; min-width: 0; }
+  .booking-info .slot-text {
+    font-size: 13px; color: var(--text);
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  .booking-info .slot-status {
+    font-size: 10px; color: var(--text2); margin-top: 2px; letter-spacing: 0.05em;
+  }
+  .badge {
+    padding: 4px 10px; border-radius: 100px; font-size: 9px; font-weight: 500;
+    letter-spacing: 0.15em; text-transform: uppercase; white-space: nowrap;
+  }
+  .badge.paid {
+    background: rgba(201, 169, 97, 0.15); color: var(--gold);
+    border: 1px solid var(--gold-soft);
+  }
+  .badge.unpaid {
+    background: rgba(184, 138, 138, 0.1); color: var(--rose);
+    border: 1px solid rgba(184, 138, 138, 0.2);
+  }
+
+  .course-banner {
+    height: 200px; border-radius: 20px;
+    background:
+      radial-gradient(ellipse at center, rgba(201, 169, 97, 0.15), transparent 70%),
+      linear-gradient(135deg, var(--green-deep), var(--bg));
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    margin-bottom: 16px; overflow: hidden; position: relative;
+    border: 1px solid var(--border);
+  }
+  .course-banner::before, .course-banner::after {
+    content: ''; position: absolute; width: 80%; height: 1px; left: 10%;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent); opacity: 0.4;
+  }
+  .course-banner::before { top: 30%; }
+  .course-banner::after { bottom: 30%; }
+  .course-banner-emblem { margin-bottom: 14px; opacity: 0.6; }
+  .course-banner-text {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 32px; font-weight: 300; font-style: italic;
+    color: var(--gold2); text-align: center; line-height: 1;
+    z-index: 1; letter-spacing: 0.02em;
+  }
+  .course-meta {
+    display: flex; gap: 14px; margin-bottom: 16px; padding: 18px 16px;
+    background: var(--bg2); border: 1px solid var(--border); border-radius: 14px;
+  }
+  .course-meta-item { flex: 1; text-align: center; }
+  .course-meta-item .val {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 26px; font-weight: 300; color: var(--gold2); line-height: 1;
+  }
+  .course-meta-item .lbl {
+    font-size: 9px; color: var(--text2); letter-spacing: 0.2em;
+    text-transform: uppercase; margin-top: 6px; display: block;
+  }
+  .course-desc {
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: 14px; padding: 18px; font-size: 13px; color: var(--text);
+    line-height: 1.8; margin-bottom: 16px; font-weight: 300;
+  }
+
+  .practice-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .practice-card {
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: 16px; padding: 18px; cursor: pointer;
+    transition: all 0.2s; text-align: center;
+    position: relative; overflow: hidden;
+  }
+  .practice-card::before {
+    content: ''; position: absolute; top: 0; left: 50%;
+    width: 1px; height: 16px;
+    background: linear-gradient(180deg, transparent, var(--gold)); opacity: 0.3;
+  }
+  .practice-card:hover {
+    border-color: var(--gold); background: rgba(201, 169, 97, 0.05);
+  }
+  .practice-card .icon { font-size: 22px; margin-bottom: 10px; display: block; }
+  .practice-card .name {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 15px; font-weight: 400; color: var(--gold2);
+    margin-bottom: 4px; font-style: italic;
+  }
+  .practice-card .desc {
+    font-size: 10px; color: var(--text2); line-height: 1.5; letter-spacing: 0.03em;
+  }
+
+  .modal-overlay {
+    position: fixed; inset: 0; background: rgba(10, 20, 16, 0.92);
+    backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+    display: flex; align-items: flex-end; z-index: 100;
+    opacity: 0; pointer-events: none; transition: opacity 0.3s;
+  }
+  .modal-overlay.open { opacity: 1; pointer-events: all; }
+  .modal {
+    width: 100%; background: var(--bg2);
+    border-radius: 24px 24px 0 0; padding: 12px 20px 36px;
+    transform: translateY(100%);
+    transition: transform 0.35s cubic-bezier(0.34,1.56,0.64,1);
+    max-height: 85vh; overflow-y: auto;
+    border-top: 1px solid var(--gold-soft);
+  }
+  .modal-overlay.open .modal { transform: translateY(0); }
+  .modal-handle {
+    width: 36px; height: 4px; background: var(--text3);
+    border-radius: 2px; margin: 0 auto 20px;
+  }
+  .modal h3 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 22px; font-weight: 400; color: var(--gold2);
+    margin-bottom: 16px; font-style: italic; text-align: center;
+  }
+  .modal p {
+    font-size: 13px; color: var(--text);
+    line-height: 1.8; margin-bottom: 20px;
+    white-space: pre-line; font-weight: 300;
+  }
+
+  .toast {
+    position: fixed; bottom: 30px; left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: var(--bg2); border: 1px solid var(--gold);
+    border-radius: 100px; padding: 12px 24px;
+    font-size: 12px; color: var(--gold2); letter-spacing: 0.1em;
+    opacity: 0; pointer-events: none; transition: all 0.3s;
+    z-index: 200; text-transform: uppercase;
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  .loading {
+    display: flex; align-items: center; justify-content: center;
+    padding: 40px; color: var(--text2); font-size: 12px; gap: 10px;
+    letter-spacing: 0.1em;
+  }
+  .spinner {
+    width: 16px; height: 16px;
+    border: 1px solid var(--border); border-top-color: var(--gold);
+    border-radius: 50%; animation: spin 1s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .empty-state { text-align: center; padding: 40px 20px; color: var(--text2); }
+  .empty-state .icon { font-size: 32px; margin-bottom: 12px; opacity: 0.4; }
+  .empty-state p { font-size: 12px; line-height: 1.6; letter-spacing: 0.05em; }
+
+  .courses-stack { display: flex; flex-direction: column; gap: 16px; }
+  .course-card-mini {
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: 18px; padding: 16px;
+  }
+  .course-card-mini .title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 22px; font-weight: 400; font-style: italic;
+    color: var(--gold2); margin-bottom: 10px; text-align: center;
+  }
+  .course-card-mini .meta {
+    display: flex; gap: 10px; margin-bottom: 12px;
+    background: var(--bg3); border-radius: 12px; padding: 12px;
+  }
+  .course-card-mini .meta-item { flex: 1; text-align: center; }
+  .course-card-mini .meta-val {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 20px; color: var(--gold2); line-height: 1;
+  }
+  .course-card-mini .meta-lbl {
+    font-size: 8px; color: var(--text2);
+    letter-spacing: 0.2em; text-transform: uppercase; margin-top: 4px;
+  }
+  .course-card-mini .desc {
+    font-size: 12px; color: var(--text); line-height: 1.7;
+    margin-bottom: 14px;
+  }
+  .course-card-mini .btn { padding: 12px; font-size: 11px; }
+
+  .hint {
+    text-align: center; color: var(--text2); font-size: 11px;
+    padding: 16px 8px; line-height: 1.7; letter-spacing: 0.05em;
+  }
+
+  .input {
+    padding: 12px 14px;
+    background: var(--bg3); border: 1px solid var(--border);
+    border-radius: 12px; color: var(--text);
+    font-family: inherit; font-size: 13px;
+    outline: none; transition: border-color 0.2s;
+    box-sizing: border-box;
+  }
+  .input:focus { border-color: var(--gold); }
+  .input::placeholder { color: var(--text3); }
+</style>
+</head>
+<body>
+<div class="app">
+
+<div class="topbar">
+  <div class="user">
+    <div class="avatar" id="user-avatar">У</div>
+    <div class="user-text">
+      <div class="user-name" id="user-name">Гость</div>
+      <div class="user-label" data-i18n="cabinet">Личный кабинет</div>
+    </div>
+  </div>
+  <div class="lang-toggle">
+    <button data-lang="ru" class="active">RU</button>
+    <button data-lang="uk">UK</button>
+  </div>
+</div>
+
+<div class="brand">
+  <svg class="brand-emblem" width="36" height="36" viewBox="0 0 36 36" fill="none">
+    <circle cx="18" cy="18" r="11" stroke="#c9a961" stroke-width="0.5" opacity="0.6"/>
+    <path d="M18 7 L18 11 M18 25 L18 29 M7 18 L11 18 M25 18 L29 18" stroke="#c9a961" stroke-width="0.5" opacity="0.6"/>
+    <circle cx="18" cy="18" r="2" fill="#c9a961" opacity="0.8"/>
+    <path d="M14 18 Q18 14 22 18 Q18 22 14 18" stroke="#c9a961" stroke-width="0.5" fill="none" opacity="0.5"/>
+  </svg>
+  <div class="brand-mark">soul support</div>
+  <div class="brand-sub" data-i18n="brand_sub">Александра Мозер · Психолог</div>
+</div>
+
+<div class="tabs-wrap">
+  <div class="tabs">
+    <button class="tab active" data-tab="booking" data-i18n="tab_booking">Запись</button>
+    <button class="tab" data-tab="progress" data-i18n="tab_progress">Прогресс</button>
+    <button class="tab" data-tab="courses" data-i18n="tab_courses">Курсы</button>
+    <button class="tab" data-tab="practices" data-i18n="tab_practices">Практики</button>
+  </div>
+</div>
+
+<div id="tab-booking" class="content active">
+  <div class="cal-card">
+    <div class="month-nav">
+      <button class="month-btn" id="prev-month">‹</button>
+      <h2 id="month-title"></h2>
+      <button class="month-btn" id="next-month">›</button>
+    </div>
+    <div class="cal-grid" id="cal-grid"></div>
+  </div>
+
+  <div id="slots-section" class="slots-section" style="display:none">
+    <div class="section-label" id="slots-title" data-i18n="select_time">Выберите время</div>
+    <div class="slots-grid" id="slots-grid"></div>
+    <button class="btn" id="book-btn" disabled data-i18n="select_time_first">Выберите время</button>
+  </div>
+
+  <div id="booking-loading" class="loading" style="display:none">
+    <div class="spinner"></div> <span data-i18n="loading">Загрузка</span>…
+  </div>
+
+  <div class="hint" data-i18n="booking_hint">Выберите свободный день в календаре</div>
+</div>
+
+<div id="tab-progress" class="content">
+  <div id="progress-loading" class="loading">
+    <div class="spinner"></div> <span data-i18n="loading">Загрузка</span>…
+  </div>
+  <div id="progress-content" style="display:none">
+    <div class="stats-row">
+      <div class="stat">
+        <div class="stat-num" id="stat-sessions">0</div>
+        <div class="stat-lbl" data-i18n="sessions">Сессий</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num" id="stat-paid">0</div>
+        <div class="stat-lbl" data-i18n="paid">Оплачено</div>
+      </div>
+    </div>
+    <div class="mood-card">
+      <h3 data-i18n="mood_title">Настроение · 7 дней</h3>
+      <div class="mood-bars" id="mood-bars"></div>
+    </div>
+    <div class="section-label" data-i18n="my_bookings">Мои записи</div>
+    <div id="bookings-list"></div>
+  </div>
+</div>
+
+<div id="tab-courses" class="content">
+  <div id="courses-list"></div>
+</div>
+
+<div id="tab-practices" class="content">
+  <div class="practice-grid">
+    <div class="practice-card" data-practice="breathing478">
+      <span class="icon">🌬</span>
+      <div class="name">4-7-8</div>
+      <div class="desc" data-i18n="p_478_desc">Успокоить нервную систему</div>
+    </div>
+    <div class="practice-card" data-practice="box">
+      <span class="icon">⬜</span>
+      <div class="name" data-i18n="p_box_name">Квадратное</div>
+      <div class="desc" data-i18n="p_box_desc">Восстановление фокуса</div>
+    </div>
+    <div class="practice-card" data-practice="grounding">
+      <span class="icon">🌱</span>
+      <div class="name">5-4-3-2-1</div>
+      <div class="desc" data-i18n="p_ground_desc">Заземление в моменте</div>
+    </div>
+    <div class="practice-card" data-practice="tension">
+      <span class="icon">💪</span>
+      <div class="name" data-i18n="p_tension_name">Напряжение</div>
+      <div class="desc" data-i18n="p_tension_desc">Выход адреналина</div>
+    </div>
+    <div class="practice-card" data-practice="cold">
+      <span class="icon">❄️</span>
+      <div class="name" data-i18n="p_cold_name">Холод</div>
+      <div class="desc" data-i18n="p_cold_desc">Сброс при панике</div>
+    </div>
+    <div class="practice-card" data-practice="cognitive">
+      <span class="icon">🧠</span>
+      <div class="name" data-i18n="p_cog_name">Ну и что?</div>
+      <div class="desc" data-i18n="p_cog_desc">Выход из тревоги</div>
+    </div>
+  </div>
+</div>
+
+</div>
+
+<div class="modal-overlay" id="modal-overlay">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <h3 id="modal-title"></h3>
+    <p id="modal-body"></p>
+    <button class="btn" id="modal-btn" data-i18n="close">Закрыть</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const I18N = {
+  ru: {
+    cabinet: 'Личный кабинет',
+    brand_sub: 'Александра Мозер · Психолог',
+    tab_booking: 'Запись', tab_progress: 'Прогресс',
+    tab_courses: 'Курсы', tab_practices: 'Практики',
+    select_time: 'Выберите время', select_time_first: 'Выберите время',
+    loading: 'Загрузка',
+    booking_hint: 'Выберите свободный день в календаре',
+    sessions: 'Сессий', paid: 'Оплачено',
+    mood_title: 'Настроение · 7 дней',
+    my_bookings: 'Мои записи',
+    course_name: 'взросление',
+    lessons: 'Уроков', each: 'Каждый',
+    course_desc: 'Бодинамический курс Лилии Копейченко. С внутриутробного развития до 12 лет происходит фундаментальное формирование характера. Программа позволяет «перепрошить» психологические и физические процессы на здоровый лад, раскрыть потенциал личности.',
+    course_pay: 'Подробнее и оплатить', close: 'Закрыть',
+    p_478_desc: 'Успокоить нервную систему',
+    p_box_name: 'Квадратное', p_box_desc: 'Восстановление фокуса',
+    p_ground_desc: 'Заземление в моменте',
+    p_tension_name: 'Напряжение', p_tension_desc: 'Выход адреналина',
+    p_cold_name: 'Холод', p_cold_desc: 'Сброс при панике',
+    p_cog_name: 'Ну и что?', p_cog_desc: 'Выход из тревоги',
+    months: ['Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь'],
+    days: ['Пн','Вт','Ср','Чт','Пт','Сб','Вс'],
+    days_full: ['Вс','Пн','Вт','Ср','Чт','Пт','Сб'],
+    no_bookings: 'Записей пока нет', no_data: 'Данных нет',
+    book_for: 'Записаться на', sending: 'Отправляем…',
+    request_sent: 'Запрос отправлен', error: 'Ошибка',
+    paid_label: 'Оплачено', waiting: 'Ожидает',
+    course_modal_title: 'Курс «Взросление»',
+    course_modal_body: 'Бодинамический Курс Лилии Копейченко.\n\n80 уроков по 50 минут — телесные практики, похожие на йогу.\n\nЗа 9 месяцев (2 раза в неделю) вы закрепите здоровые паттерны на нейронном уровне.\n\nСтоимость: 3000 UAH\nКарта: 4149 6293 5967 9438\nПолучатель: Лілія Копейченко',
+    course_modal_btn: 'Перейти в бот для оплаты',
+    practices: {
+      breathing478: { title: 'Дыхание 4-7-8', body: 'Вдох носом — 4 секунды\nЗадержка — 7 секунд\nВыдох ртом — 8 секунд\n\nПовторите 4 раза. Делайте медленно и осознанно. Эта техника успокаивает нервную систему за 2-3 минуты.' },
+      box: { title: 'Квадратное дыхание', body: 'Представьте квадрат и двигайтесь по его граням:\n\n1. Вдох — 4 секунды\n2. Пауза — 4 секунды\n3. Выдох — 4 секунды\n4. Пауза — 4 секунды\n\nПринудительно переключает организм из стресса в фокус.' },
+      grounding: { title: 'Заземление 5-4-3-2-1', body: 'Назовите вслух или про себя:\n\n5 вещей, которые вы видите\n4 поверхности, которых касаетесь\n3 звука, которые слышите\n2 запаха\n1 вкус\n\nВозвращает в настоящий момент при тревоге.' },
+      tension: { title: 'Толкание стены', body: 'Подойдите к стене и изо всех сил пытайтесь её «сдвинуть» в течение 10-15 секунд.\n\nДаёт выход накопившемуся адреналину. После — глубокий выдох и расслабление.' },
+      cold: { title: 'Температурный сброс', body: 'Приложите холодное мокрое полотенце к лицу или подержите руки под ледяной водой 30 секунд.\n\nПерезагружает блуждающий нерв — самый быстрый способ успокоиться при панике.' },
+      cognitive: { title: 'Техника «Ну и что?»', body: '1. Худший сценарий: что самое страшное может случиться?\n2. Лучший сценарий: как выглядит идеальный исход?\n3. Реалистичный: что произойдёт с вероятностью 80%?\n4. Первый шаг: если худшее случится — что сделаю?\n\nЗапишите ответы — это меняет перспективу.' }
+    }
+  },
+  uk: {
+    cabinet: 'Особистий кабінет',
+    brand_sub: 'Олександра Мозер · Психолог',
+    tab_booking: 'Запис', tab_progress: 'Прогрес',
+    tab_courses: 'Курси', tab_practices: 'Практики',
+    select_time: 'Оберіть час', select_time_first: 'Оберіть час',
+    loading: 'Завантаження',
+    booking_hint: 'Оберіть вільний день у календарі',
+    sessions: 'Сесій', paid: 'Оплачено',
+    mood_title: 'Настрій · 7 днів',
+    my_bookings: 'Мої записи',
+    course_name: 'дорослішання',
+    lessons: 'Уроків', each: 'Кожен',
+    course_desc: 'Бодинамічний курс Лілії Копейченко. З внутрішньоутробного розвитку до 12 років відбувається фундаментальне формування характеру. Програма дозволяє «перепрошити» психологічні та фізичні процеси на здоровий лад, розкрити потенціал особистості.',
+    course_pay: 'Детальніше та оплатити', close: 'Закрити',
+    p_478_desc: 'Заспокоїти нервову систему',
+    p_box_name: 'Квадратне', p_box_desc: 'Відновлення фокусу',
+    p_ground_desc: 'Заземлення в моменті',
+    p_tension_name: 'Напруга', p_tension_desc: 'Вихід адреналіну',
+    p_cold_name: 'Холод', p_cold_desc: 'Скидання при паніці',
+    p_cog_name: 'Ну і що?', p_cog_desc: 'Вихід з тривоги',
+    months: ['Січень','Лютий','Березень','Квітень','Травень','Червень','Липень','Серпень','Вересень','Жовтень','Листопад','Грудень'],
+    days: ['Пн','Вт','Ср','Чт','Пт','Сб','Нд'],
+    days_full: ['Нд','Пн','Вт','Ср','Чт','Пт','Сб'],
+    no_bookings: 'Записів поки немає', no_data: 'Даних немає',
+    book_for: 'Записатися на', sending: 'Надсилаємо…',
+    request_sent: 'Запит надіслано', error: 'Помилка',
+    paid_label: 'Оплачено', waiting: 'Очікує',
+    course_modal_title: 'Курс «Дорослішання»',
+    course_modal_body: 'Бодинамічний Курс Лілії Копейченко.\n\n80 уроків по 50 хвилин — тілесні практики, схожі на йогу.\n\nЗа 9 місяців (2 рази на тиждень) ви закріпите здорові патерни на нейронному рівні.\n\nВартість: 3000 UAH\nКартка: 4149 6293 5967 9438\nОтримувач: Лілія Копейченко',
+    course_modal_btn: 'Перейти в бот для оплати',
+    practices: {
+      breathing478: { title: 'Дихання 4-7-8', body: 'Вдих носом — 4 секунди\nЗатримка — 7 секунд\nВидих ротом — 8 секунд\n\nПовторіть 4 рази. Робіть повільно та усвідомлено. Ця техніка заспокоює нервову систему за 2-3 хвилини.' },
+      box: { title: 'Квадратне дихання', body: 'Уявіть квадрат і рухайтеся по його гранях:\n\n1. Вдих — 4 секунди\n2. Пауза — 4 секунди\n3. Видих — 4 секунди\n4. Пауза — 4 секунди\n\nПримусово перемикає організм зі стресу в фокус.' },
+      grounding: { title: 'Заземлення 5-4-3-2-1', body: 'Назвіть вголос або подумки:\n\n5 речей, які бачите\n4 поверхні, яких торкаєтеся\n3 звуки, які чуєте\n2 запахи\n1 смак\n\nПовертає в теперішній момент при тривозі.' },
+      tension: { title: 'Штовхання стіни', body: 'Підійдіть до стіни і з усіх сил намагайтеся її «зрушити» протягом 10-15 секунд.\n\nДає вихід накопиченому адреналіну. Після — глибокий видих і розслаблення.' },
+      cold: { title: 'Температурне скидання', body: 'Прикладіть холодний мокрий рушник до обличчя або потримайте руки під крижаною водою 30 секунд.\n\nПерезавантажує блукаючий нерв — найшвидший спосіб заспокоїтися при паніці.' },
+      cognitive: { title: 'Техніка «Ну і що?»', body: '1. Найгірший сценарій: що найстрашніше може статися?\n2. Найкращий сценарій: який ідеальний результат?\n3. Реалістичний: що станеться з імовірністю 80%?\n4. Перший крок: якщо найгірше станеться — що зроблю?\n\nЗапишіть відповіді — це змінює перспективу.' }
+    }
+  }
+};
+
+let lang = 'ru';
+function t(key) { return I18N[lang][key] || I18N.ru[key] || key; }
+
+function applyLang() {
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const key = el.dataset.i18n;
+    if (I18N[lang][key]) el.textContent = I18N[lang][key];
+  });
+  document.documentElement.lang = lang;
+  renderCalendar();
+  if (document.getElementById('progress-content').style.display !== 'none') {
+    loadProgress();
+  }
+  if (document.getElementById('tab-courses').classList.contains('active')) {
+    renderCourses();
+  }
+}
+
+document.querySelectorAll('.lang-toggle button').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.lang-toggle button').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    lang = btn.dataset.lang;
+    applyLang();
+  });
+});
+
+const tg = window.Telegram.WebApp;
+tg.ready();
+tg.expand();
+try {
+  tg.setHeaderColor('#0a1410');
+  tg.setBackgroundColor('#0a1410');
+} catch(e) {}
+
+const user = tg.initDataUnsafe?.user || {};
+const userId = user.id || null;
+const userName = user.first_name || user.username || 'Гость';
+const userAvatar = user.photo_url || null;
+const userLangCode = user.language_code || 'ru';
+
+if (userLangCode === 'uk' || userLangCode === 'ua') {
+  lang = 'uk';
+  document.querySelectorAll('.lang-toggle button').forEach(b => {
+    b.classList.toggle('active', b.dataset.lang === 'uk');
+  });
+}
+
+document.getElementById('user-name').textContent = userName;
+const avatarEl = document.getElementById('user-avatar');
+if (userAvatar) {
+  avatarEl.innerHTML = '<img src="' + userAvatar + '" alt="">';
+} else {
+  avatarEl.textContent = userName.charAt(0).toUpperCase();
+}
+
+const API_BASE = 'https://start-production-d65b.up.railway.app/api';
+
+let currentMonth = new Date();
+let slots = {};
+let selectedDate = null;
+let selectedSlot = null;
+
+document.querySelectorAll('.tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    const name = tab.dataset.tab;
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.content').forEach(c => c.classList.remove('active'));
+    tab.classList.add('active');
+    document.getElementById('tab-' + name).classList.add('active');
+    if (name === 'progress') loadProgress();
+    if (name === 'courses') renderCourses();
+  });
+});
+
+async function loadSlots() {
+  document.getElementById('booking-loading').style.display = 'flex';
+  try {
+    const res = await fetch(API_BASE + '/slots');
+    const data = await res.json();
+    slots = {};
+    (data || []).forEach(s => {
+      const d = s.slot_date;
+      if (!d) return;
+      if (!slots[d]) slots[d] = [];
+      const m = (s.slot || '').match(/(\d+:\d+)/);
+      if (m) slots[d].push({ time: m[1], full: s.slot });
+    });
+  } catch(e) {
+    const today = new Date();
+    for (let i = 1; i <= 14; i++) {
+      const d = new Date(today);
+      d.setDate(today.getDate() + i);
+      if (d.getDay() !== 0) {
+        const k = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+        slots[k] = [
+          { time: '10:00', full: k + ' 10:00' },
+          { time: '14:00', full: k + ' 14:00' },
+          { time: '17:00', full: k + ' 17:00' },
+        ];
+      }
+    }
+  }
+  document.getElementById('booking-loading').style.display = 'none';
+  renderCalendar();
+}
+
+function renderCalendar() {
+  const grid = document.getElementById('cal-grid');
+  const title = document.getElementById('month-title');
+  const y = currentMonth.getFullYear();
+  const m = currentMonth.getMonth();
+  title.textContent = I18N[lang].months[m] + ' ' + y;
+  grid.innerHTML = '';
+
+  I18N[lang].days.forEach(d => {
+    const el = document.createElement('div');
+    el.className = 'cal-day-name';
+    el.textContent = d;
+    grid.appendChild(el);
+  });
+
+  const first = new Date(y, m, 1);
+  const offset = (first.getDay() + 6) % 7;
+  const daysCount = new Date(y, m + 1, 0).getDate();
+  const today = new Date(); today.setHours(0,0,0,0);
+
+  for (let i = 0; i < offset; i++) {
+    const el = document.createElement('div');
+    el.className = 'cal-day empty';
+    grid.appendChild(el);
+  }
+
+  for (let d = 1; d <= daysCount; d++) {
+    const date = new Date(y, m, d);
+    const dateStr = date.getFullYear() + '-' + String(date.getMonth()+1).padStart(2,'0') + '-' + String(date.getDate()).padStart(2,'0');
+    const el = document.createElement('div');
+    el.textContent = d;
+    const cls = ['cal-day'];
+    if (date < today) cls.push('past');
+    else if (date.toDateString() === today.toDateString()) cls.push('today');
+
+    if (slots[dateStr] && slots[dateStr].length > 0 && date >= today) {
+      cls.push('has-slots');
+      const dot = document.createElement('div');
+      dot.className = 'dot';
+      el.appendChild(dot);
+      el.addEventListener('click', () => selectDate(dateStr));
+    }
+    if (selectedDate === dateStr) cls.push('selected');
+    el.className = cls.join(' ');
+    grid.appendChild(el);
+  }
+}
+
+function selectDate(dateStr) {
+  selectedDate = dateStr;
+  selectedSlot = null;
+  renderCalendar();
+  showSlots(dateStr);
+}
+
+function showSlots(dateStr) {
+  const section = document.getElementById('slots-section');
+  const title = document.getElementById('slots-title');
+  const grid = document.getElementById('slots-grid');
+  const btn = document.getElementById('book-btn');
+
+  const [y, m, d] = dateStr.split('-');
+  title.textContent = parseInt(d) + ' ' + I18N[lang].months[parseInt(m)-1].toLowerCase();
+  grid.innerHTML = '';
+  btn.disabled = true;
+  btn.textContent = t('select_time_first');
+
+  (slots[dateStr] || []).forEach(s => {
+    const el = document.createElement('button');
+    el.className = 'slot-btn';
+    el.textContent = s.time;
+    el.addEventListener('click', () => {
+      document.querySelectorAll('.slot-btn').forEach(b => b.classList.remove('selected'));
+      el.classList.add('selected');
+      selectedSlot = s.full;
+      btn.disabled = false;
+      btn.textContent = t('book_for') + ' ' + s.time;
+    });
+    grid.appendChild(el);
+  });
+
+  section.style.display = 'block';
+  setTimeout(() => section.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 100);
+}
+
+async function sendBooking(extra) {
+  const body = Object.assign(
+    { user_id: userId, slot: selectedSlot, lang: lang },
+    extra || {}
+  );
+  const res = await fetch(API_BASE + '/book', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify(body)
+  });
+  return { ok: res.ok, data: await res.json() };
+}
+
+function showNameForm() {
+  const labels = lang === 'ru'
+    ? { title: 'Запись на консультацию', name: 'Ваше имя', phone: 'Номер телефона (или нажмите «Пропустить»)', send: 'Подтвердить запись', skip: 'Пропустить' }
+    : { title: 'Запис на консультацію', name: 'Ваше ім\'я', phone: 'Номер телефону (або натисніть «Пропустити»)', send: 'Підтвердити запис', skip: 'Пропустити' };
+
+  document.getElementById('modal-title').textContent = labels.title;
+  document.getElementById('modal-body').innerHTML =
+    '<input class="input" id="form-name" placeholder="' + labels.name + '" style="margin-bottom:10px;width:100%" />' +
+    '<input class="input" id="form-phone" placeholder="' + labels.phone + '" style="width:100%" />';
+
+  const btn = document.getElementById('modal-btn');
+  btn.textContent = labels.send;
+  btn.onclick = async () => {
+    const name = document.getElementById('form-name').value.trim();
+    const phone = document.getElementById('form-phone').value.trim();
+    if (!name) { showToast(lang === 'ru' ? 'Введите имя' : 'Введіть ім\'я'); return; }
+    btn.disabled = true;
+    btn.textContent = t('sending');
+    try {
+      const r = await sendBooking({ name, phone: phone || '—' });
+      if (r.ok && r.data.status === 'booked') {
+        closeModal();
+        showToast('✓ ' + t('request_sent'));
+        setTimeout(() => tg.close(), 1200);
+      } else {
+        showToast(t('error'));
+        btn.disabled = false;
+        btn.textContent = labels.send;
+      }
+    } catch(e) {
+      showToast(t('error'));
+      btn.disabled = false;
+      btn.textContent = labels.send;
+    }
+  };
+  document.getElementById('modal-overlay').classList.add('open');
+}
+
+document.getElementById('book-btn').addEventListener('click', async () => {
+  if (!selectedSlot) return;
+  if (!userId) { showToast(t('error')); return; }
+  const btn = document.getElementById('book-btn');
+  btn.disabled = true;
+  btn.textContent = t('sending');
+  try {
+    const r = await sendBooking();
+    if (r.ok && r.data.status === 'booked') {
+      showToast('✓ ' + t('request_sent'));
+      setTimeout(() => tg.close(), 1200);
+    } else if (r.data.status === 'need_form') {
+      btn.disabled = false;
+      btn.textContent = t('book_for') + ' ' + (selectedSlot.match(/\d+:\d+/) || [''])[0];
+      showNameForm();
+    } else if (r.data.status === 'exists') {
+      showToast(lang === 'ru' ? 'У вас уже есть активная запись' : 'У вас вже є активний запис');
+      btn.disabled = false;
+      btn.textContent = t('book_for') + ' ' + (selectedSlot.match(/\d+:\d+/) || [''])[0];
+    } else {
+      showToast(t('error'));
+      btn.disabled = false;
+      btn.textContent = t('book_for') + ' ' + (selectedSlot.match(/\d+:\d+/) || [''])[0];
+    }
+  } catch(e) {
+    showToast(t('error'));
+    btn.disabled = false;
+  }
+});
+
+document.getElementById('prev-month').addEventListener('click', () => {
+  currentMonth.setMonth(currentMonth.getMonth() - 1);
+  selectedDate = null;
+  document.getElementById('slots-section').style.display = 'none';
+  renderCalendar();
+});
+document.getElementById('next-month').addEventListener('click', () => {
+  currentMonth.setMonth(currentMonth.getMonth() + 1);
+  selectedDate = null;
+  document.getElementById('slots-section').style.display = 'none';
+  renderCalendar();
+});
+
+async function loadProgress() {
+  if (!userId) {
+    document.getElementById('progress-loading').innerHTML =
+      '<div class="empty-state"><div class="icon">·</div><p>' + (lang==='ru' ? 'Откройте через бот' : 'Відкрийте через бот') + '</p></div>';
+    return;
+  }
+  document.getElementById('progress-loading').style.display = 'flex';
+  document.getElementById('progress-content').style.display = 'none';
+  try {
+    const [s, m, b] = await Promise.all([
+      fetch(API_BASE + '/stats/' + userId).then(r => r.json()),
+      fetch(API_BASE + '/mood/' + userId).then(r => r.json()),
+      fetch(API_BASE + '/bookings/' + userId).then(r => r.json()),
+    ]);
+    document.getElementById('stat-sessions').textContent = s.total || 0;
+    document.getElementById('stat-paid').textContent = s.paid || 0;
+    renderMood(m);
+    renderBookings(b);
+  } catch(e) {
+    document.getElementById('stat-sessions').textContent = '—';
+    document.getElementById('stat-paid').textContent = '—';
+    renderMood([]);
+    renderBookings([]);
+  }
+  document.getElementById('progress-loading').style.display = 'none';
+  document.getElementById('progress-content').style.display = 'block';
+}
+
+function renderMood(data) {
+  const c = document.getElementById('mood-bars');
+  if (!data || !data.length) {
+    c.innerHTML = '<div style="color:var(--text2);font-size:11px;width:100%;text-align:center;letter-spacing:0.1em">' + t('no_data') + '</div>';
+    return;
+  }
+  c.innerHTML = '';
+  const D = I18N[lang].days_full;
+  const emojis = {1:'😢',2:'😔',3:'😐',4:'🙂',5:'😊'};
+  data.slice(-7).forEach(e => {
+    const pct = (e.mood / 5) * 100;
+    const w = document.createElement('div');
+    w.className = 'mood-bar-wrap';
+    const date = new Date(e.created_at);
+    w.innerHTML =
+      '<div class="mood-bar-emoji">' + (emojis[e.mood]||'·') + '</div>' +
+      '<div class="mood-bar" style="height:' + pct + '%"></div>' +
+      '<div class="mood-bar-date">' + D[date.getDay()] + '</div>';
+    c.appendChild(w);
+  });
+}
+
+function renderBookings(data) {
+  const list = document.getElementById('bookings-list');
+  if (!data || !data.length) {
+    list.innerHTML = '<div class="empty-state"><div class="icon">·</div><p>' + t('no_bookings') + '</p></div>';
+    return;
+  }
+  list.innerHTML = '';
+  data.slice(0, 5).forEach(b => {
+    const el = document.createElement('div');
+    el.className = 'booking-item';
+    el.innerHTML =
+      '<div class="booking-icon">·</div>' +
+      '<div class="booking-info">' +
+        '<div class="slot-text">' + (b.slot || '—') + '</div>' +
+        '<div class="slot-status">' + (b.name || '') + '</div>' +
+      '</div>' +
+      '<span class="badge ' + (b.paid ? 'paid' : 'unpaid') + '">' +
+        (b.paid ? '✓ ' + t('paid_label') : t('waiting')) +
+      '</span>';
+    list.appendChild(el);
+  });
+}
+
+document.querySelectorAll('.practice-card').forEach(card => {
+  card.addEventListener('click', () => {
+    const k = card.dataset.practice;
+    const p = I18N[lang].practices[k];
+    if (!p) return;
+    document.getElementById('modal-title').textContent = p.title;
+    document.getElementById('modal-body').textContent = p.body;
+    document.getElementById('modal-btn').textContent = t('close');
+    document.getElementById('modal-btn').onclick = closeModal;
+    document.getElementById('modal-overlay').classList.add('open');
+  });
+});
+
+// (старый open-course обработчик удалён — теперь карточки в COURSES_DATA)
+
+function closeModal() {
+  document.getElementById('modal-overlay').classList.remove('open');
+}
+document.getElementById('modal-overlay').addEventListener('click', (e) => {
+  if (e.target.id === 'modal-overlay') closeModal();
+});
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+applyLang();
+loadSlots();
+</script>
+</body>
+</html>
